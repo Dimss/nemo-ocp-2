@@ -1,0 +1,32 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongo-comments
+spec:
+  selector:
+    app: mongo-comments
+  ports:
+  - name: mongo
+    port: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-comments
+  labels:
+    app: mongo-comments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-comments
+  template:
+    metadata:
+      labels:
+        app: mongo-comments
+    spec:
+      containers:
+      - name: mongo-comments
+        image: docker-registry.default.svc:5000/nemo/mongo:latest
+        ports:
+        - containerPort: 27017

@@ -1,0 +1,41 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: likes
+  lables:
+    app: likes
+spec:
+  selector:
+    app: likes
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: likes
+  labels:
+    app: likes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: likes
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: likes
+        version: v1
+    spec:
+      containers:
+      - name: likes
+        image: docker-registry.default.svc:5000/nemo/likes:0.1
+        env:
+        - name: PROFILE
+          value: PROD
+        ports:
+        - containerPort: 8080

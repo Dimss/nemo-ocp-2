@@ -1,0 +1,23 @@
+apiVersion: "v1"
+kind: "DeploymentConfig"
+metadata:
+  name: tel
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: tel
+    spec:
+      containers:
+      - name: tel
+        image: datawire/telepresence-k8s:0.95
+  replicas: 1
+  triggers:
+  - type: ConfigChange
+  strategy:
+    type: Rolling
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0

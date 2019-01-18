@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+    name: mongo
+spec:
+    tags:
+    - from:
+          kind: DockerImage
+          name: mongo
+      name: latest
+      importPolicy:
+          scheduled: true

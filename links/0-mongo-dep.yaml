@@ -1,0 +1,34 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongo-links
+spec:
+  selector:
+    app: mongo-links
+  ports:
+  - name: mongo
+    port: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-links
+  labels:
+    app: mongo-links
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-links
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: mongo-links
+    spec:
+      containers:
+      - name: mongo-links
+        image: docker-registry.default.svc:5000/nemo/mongo:latest
+        ports:
+        - containerPort: 27017

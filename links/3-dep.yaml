@@ -1,0 +1,41 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: links
+  lables:
+    app: links
+spec:
+  selector:
+    app: links
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: links
+  labels:
+    app: links
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: links
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: links
+        version: v1
+    spec:
+      containers:
+      - name: links
+        image: docker-registry.default.svc:5000/nemo/links:0.1
+        env:
+        - name: PROFILE
+          value: PROD
+        ports:
+        - containerPort: 8080
