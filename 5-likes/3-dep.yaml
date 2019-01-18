@@ -1,3 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: likes
+spec:
+  host: likes
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: likes
+spec:
+  hosts:
+    - likes
+  http:
+  - route:
+    - destination:
+        host: likes
+        subset: v1
+---
 kind: Service
 apiVersion: v1
 metadata:

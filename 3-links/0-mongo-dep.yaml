@@ -1,3 +1,29 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: mongo-links
+spec:
+  host: mongo-links
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: mongo-links
+spec:
+  hosts:
+    - mongo-links
+  tcp:
+  - match:
+    - port: 27017
+    route:
+    - destination:
+        host: mongo-links
+        port:
+          number: 27017
+---
 kind: Service
 apiVersion: v1
 metadata:
