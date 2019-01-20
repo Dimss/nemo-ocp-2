@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: feed
+spec:
+  host: feed
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    outlierDetection:
+      consecutiveErrors: 3
+      interval: 15s
+      baseEjectionTime: 3m
+      maxEjectionPercent: 100
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: feed
+spec:
+  hosts:
+    - feed
+  http:
+  - route:
+    - destination:
+        host: feed
+        subset: v1
+    corsPolicy:
+      allowOrigin:
+        - "*"
+      allowMethods:
+        - POST
+        - GET
+        - DELETE
+        - PUT
+        - OPTIONS
+      allowHeaders:
+        - "X-NEMO-AUTH"
+        - "Origin"
+        - "Accept"
+        - "Content-Type"
+        - "Authorization"
+      exposeHeaders:
+        - x-custom-header
+      maxAge: 300s
+      allowCredentials: true

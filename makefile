@@ -44,7 +44,14 @@ demo1-delay:
 	oc delete virtualservices likes
 	oc delete DestinationRule likes
 	oc create -f demos/0-demo-delay.yaml
+
 demo1-abort:
 	oc delete virtualservices likes
 	oc delete DestinationRule likes
 	oc create -f demos/0-demo-abort.yaml
+
+demo2-circuit-braker:
+	oc scale deployment feed --replicas=2
+	oc delete virtualservices feed
+	oc delete DestinationRule feed
+	oc create -f demos/1-demo-cm.yaml
