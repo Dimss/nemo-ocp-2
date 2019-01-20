@@ -80,6 +80,7 @@ spec:
       containers:
       - name: feed
         image: docker-registry.default.svc:5000/nemo/feed:0.1
+        imagePullPolicy: Always
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: prod

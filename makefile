@@ -1,9 +1,17 @@
 init:
-	PROJECT_NAME=nemo
-	oc new-project ${PROJECT_NAME}
-	oc adm policy add-scc-to-user anyuid -z default -n ${PROJECT_NAME}
-	oc adm policy add-scc-to-user privileged -z default -n ${PROJECT_NAME}
-	oc create -f init/
+	oc new-project nemo
+	oc adm policy add-scc-to-user anyuid -z default -n nemo
+	oc adm policy add-scc-to-user privileged -z default -n nemo
+	oc create -f 0-init/
+
+build:
+	oc start-build comments
+	oc start-build feed
+	oc start-build identity
+	oc start-build likes
+	oc start-build links
+	oc start-build receiver
+
 create:
 	echo "1-identity"
 	cd 1-identity && oc create -f ./
@@ -31,3 +39,12 @@ delete:
 	cd 5-likes && oc delete -f ./
 	echo "5-feed"
 	cd 6-feed && oc delete -f ./
+
+demo1-delay:
+	oc delete virtualservices likes
+	oc delete DestinationRule likes
+	oc create -f demos/0-demo-delay.yaml
+demo1-abort:
+	oc delete virtualservices likes
+	oc delete DestinationRule likes
+	oc create -f demos/0-demo-abort.yaml
