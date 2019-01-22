@@ -1,41 +1,39 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: comments
+  name: ui
   lables:
-    app: comments
+    app: ui
 spec:
   selector:
-    app: comments
+    app: ui
   ports:
   - name: http
-    port: 80
-    targetPort: 8080
+    port: 5000
+    targetPort: 5000
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: comments
+  name: ui
   labels:
-    app: comments
+    app: ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: comments
+      app: ui
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "true"
       labels:
-        app: comments
+        app: ui
         version: v1
     spec:
       containers:
-      - name: comments
-        image: docker-registry.default.svc:5000/nemo/comments:0.1
-        env:
-        - name: MONGO_HOST
-          value: mongo-comments
+      - name: ui
+        image: docker-registry.default.svc:5000/nemo/ui:0.1
+        # imagePullPolicy: Always
         ports:
-        - containerPort: 8080
+        - containerPort: 5000

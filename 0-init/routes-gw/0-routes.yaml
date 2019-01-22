@@ -1,0 +1,83 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: istio-ingressgateway
+    chart: gateways-1.0.4
+    heritage: Tiller
+    istio: ingressgateway
+    maistra-version: 0.5.0
+    release: istio-1.0.4
+  name: istio-ingressgateway-frontend
+spec:
+  host: frontend.nemo
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: istio-ingressgateway
+    chart: gateways-1.0.4
+    heritage: Tiller
+    istio: ingressgateway
+    maistra-version: 0.5.0
+    release: istio-1.0.4
+  name: istio-ingressgateway-identity
+spec:
+  host: identity.nemo
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: istio-ingressgateway
+    chart: gateways-1.0.4
+    heritage: Tiller
+    istio: ingressgateway
+    maistra-version: 0.5.0
+    release: istio-1.0.4
+  name: istio-ingressgateway-receiver
+spec:
+  host: receiver.nemo
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: istio-ingressgateway
+    chart: gateways-1.0.4
+    heritage: Tiller
+    istio: ingressgateway
+    maistra-version: 0.5.0
+    release: istio-1.0.4
+  name: istio-ingressgateway-feed
+spec:
+  host: feed.nemo
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  wildcardPolicy: None

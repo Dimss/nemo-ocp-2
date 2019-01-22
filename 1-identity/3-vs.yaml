@@ -1,0 +1,34 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: identity
+spec:
+  hosts:
+    - identity.nemo
+    - identity
+  gateways:
+  - nemo-gateway
+  http:
+  - route:
+    - destination:
+        host: identity
+        subset: v1
+    corsPolicy:
+      allowOrigin:
+        - "*"
+      allowMethods:
+        - POST
+        - GET
+        - DELETE
+        - PUT
+        - OPTIONS
+      allowHeaders:
+        - "X-NEMO-AUTH"
+        - "Origin"
+        - "Accept"
+        - "Content-Type"
+        - "Authorization"
+      exposeHeaders:
+        - x-custom-header
+      maxAge: 300s
+      allowCredentials: true

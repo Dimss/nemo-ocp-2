@@ -1,3 +1,28 @@
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: tel
+#   lables:
+#     app: tel
+# spec:
+#   selector:
+#     app: tel
+#   ports:
+#   - name: http
+#     port: 8022
+#     targetPort: 8022
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: DestinationRule
+# metadata:
+#   name: tel
+# spec:
+#   host: tel
+#   trafficPolicy:
+#     tls:
+#       mode: ISTIO_MUTUAL
+
+---
 apiVersion: "v1"
 kind: "DeploymentConfig"
 metadata:
@@ -13,6 +38,8 @@ spec:
       containers:
       - name: tel
         image: datawire/telepresence-k8s:0.95
+        ports:
+        - containerPort: 8022
   replicas: 1
   triggers:
   - type: ConfigChange
