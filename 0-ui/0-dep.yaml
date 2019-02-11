@@ -34,6 +34,6 @@ spec:
       containers:
       - name: ui
         image: docker-registry.default.svc:5000/nemo/ui:0.1
-        # imagePullPolicy: Always
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000

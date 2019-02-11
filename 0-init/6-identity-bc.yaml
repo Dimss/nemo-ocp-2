@@ -16,3 +16,23 @@ spec:
     to:
       kind: "ImageStreamTag"
       name: "identity:0.1"
+---
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "identity-new-version"
+spec:
+  runPolicy: "Serial"
+  source:
+    git:
+      uri: "https://github.com/Dimss/nemo-identity-service.git"
+      ref: "new-version"
+  strategy:
+    sourceStrategy:
+      from:
+        kind: "ImageStreamTag"
+        name: "openjdk18-openshift:latest"
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "identity-new-version:0.1"

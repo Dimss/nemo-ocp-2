@@ -1,4 +1,3 @@
----
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
@@ -14,6 +13,7 @@ spec:
     - destination:
         host: feed
         subset: v1
+      weight: 100
     corsPolicy:
       allowOrigin:
         - "*"

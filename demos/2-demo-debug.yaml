@@ -1,3 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: feed-debug
+  lables:
+    app: feed-debug
+spec:
+  selector:
+    debug: feed-debug
+  ports:
+  - name: xdebug
+    port: 5005
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,19 +42,3 @@ spec:
         ports:
         - containerPort: 8080
         - containerPort: 5005
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: feed-debug
-  labels:
-    app: feed-debug
-spec:
-  selector:
-    debug: feed-debug
-  ports:
-  - name: http
-    port: 8080
-  - name: debug
-    port: 5005
-

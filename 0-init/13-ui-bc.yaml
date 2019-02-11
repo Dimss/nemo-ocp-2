@@ -16,3 +16,23 @@ spec:
     to:
       kind: "ImageStreamTag"
       name: "ui:0.1"
+---
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "ui-new-version"
+spec:
+  runPolicy: "Serial"
+  source:
+    git:
+      uri: "https://github.com/Dimss/nemo-ui.git"
+      ref: "new-version"
+  strategy:
+    sourceStrategy:
+      from:
+        kind: "ImageStreamTag"
+        name: "nodejs-8-rhel7:latest"
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "ui-new-version:0.1"

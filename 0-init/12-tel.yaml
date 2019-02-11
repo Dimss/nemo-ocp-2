@@ -38,8 +38,8 @@ spec:
       containers:
       - name: tel
         image: datawire/telepresence-k8s:0.95
-        ports:
-        - containerPort: 8022
+        # ports:
+        # - containerPort: 8022
   replicas: 1
   triggers:
   - type: ConfigChange

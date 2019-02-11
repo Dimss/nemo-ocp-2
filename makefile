@@ -5,17 +5,20 @@ init:
 	oc adm policy add-scc-to-user privileged -z default -n nemo
 	oc create -f 0-init/
 	oc delete -f 0-init/12-tel.yaml
+
+istio-routes:
 	oc create -f 0-init/routes-gw/0-routes.yaml -n istio-system
-	oc create -f 0-init/routes-gw/1-gw.yaml
 
 build:
 	oc start-build comments
 	oc start-build feed
 	oc start-build identity
+	oc start-build identity-new-version
 	oc start-build likes
 	oc start-build links
 	oc start-build receiver
 	oc start-build ui
+	oc start-build ui-new-version
 
 create:
 	echo "0-ui"
@@ -32,8 +35,8 @@ create:
 	cd 5-likes && oc create -f ./
 	echo "5-feed"
 	cd 6-feed && oc create -f ./
-	echo "Create Tel"
-	cd 0-init && oc create -f 12-tel.yaml
+	echo "Create Istio GW"
+	cd 0-init && oc create -f routes-gw/1-gw.yaml
 
 delete:
 	echo "0-ui"
@@ -50,50 +53,87 @@ delete:
 	cd 5-likes && oc delete -f ./
 	echo "5-feed"
 	cd 6-feed && oc delete -f ./
-	echo "Tel delete"
-	cd 0-init && oc delete -f 12-tel.yaml
+	echo "Delete Istio GW"
+	cd 0-init && oc delete -f routes-gw/1-gw.yaml
 
-demo1-delay:
+
+demo0-traffic-weight-identity-step1:
+	oc delete -f 1-identity/2-drule.yaml
+	oc delete -f 1-identity/3-vs.yaml
+	oc create -f 0-init/12-tel.yaml
+	oc create -f demos/0-traffic-shifting/0-weight-idenity.yaml
+
+demo0-traffic-weight-identity-step1-clean:
+	oc delete -f demos/0-traffic-shifting/0-weight-idenity.yaml
+	oc delete -f 0-init/12-tel.yaml
+	oc create -f 1-identity/2-drule.yaml
+	oc create -f 1-identity/3-vs.yaml
+
+demo0-traffic-weight-identity-step2:
+	oc delete -f 1-identity/2-drule.yaml
+	oc delete -f 1-identity/3-vs.yaml
+	oc create -f demos/0-traffic-shifting/1-weight-idenity.yaml
+
+demo0-traffic-weight-identity-step2-clean:
+	oc delete -f demos/0-traffic-shifting/1-weight-idenity.yaml
+	oc create -f 1-identity/2-drule.yaml
+	oc create -f 1-identity/3-vs.yaml
+
+demo0-traffic-header-identity-step3:
+	oc delete -f 1-identity/2-drule.yaml
+	oc delete -f 1-identity/3-vs.yaml
+	oc create -f demos/0-traffic-shifting/2-header-idenity.yaml
+
+demo0-traffic-header-identity-step3-clean:
+	oc delete -f demos/0-traffic-shifting/2-header-idenity.yaml
+	oc create -f 1-identity/2-drule.yaml
+	oc create -f 1-identity/3-vs.yaml
+
+
+demo0-delay:
 	@echo $(shell oc get virtualservices | grep "^likes" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^likes" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f demos/0-demo-delay.yaml
-demo1-delay-clean:
+demo0-delay-clean:
 	@echo $(shell oc get virtualservices | grep "^likes" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^likes" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f 5-likes/2-drule.yaml
 	oc create -f 5-likes/3-vs.yaml
-demo1-abort:
+demo0-abort:
 	@echo $(shell oc get virtualservices | grep "^likes" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^likes" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f demos/0-demo-abort.yaml
-demo1-abort-clean:
+demo0-abort-clean:
 	@echo $(shell oc get virtualservices | grep "^likes" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^likes" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f 5-likes/2-drule.yaml
 	oc create -f 5-likes/3-vs.yaml
 
-demo2-circuit-braker:
+demo1-circuit-braker:
 	oc scale deployment feed --replicas=2
 	@echo $(shell oc get virtualservices | grep "^feed" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^feed" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f demos/1-demo-cb.yaml
 
-demo2-circuit-braker-clean:
+demo1-circuit-braker-clean:
 	oc scale deployment feed --replicas=1
 	@echo $(shell oc get virtualservices | grep "^feed" | cut -f1 -d ' ' | xargs oc delete virtualservices)
 	@echo $(shell oc get destinationrules | grep "^feed" | cut -f1 -d ' ' | xargs oc delete destinationrules)
 	oc create -f 6-feed/1-drule.yaml
 	oc create -f 6-feed/2-vs.yaml
 
-demo3-debug:
+demo2-mirror:
 	oc create -f demos/2-demo-debug.yaml
-	@echo $(shell oc get virtualservices | grep "^feed" | cut -f1 -d ' ' | xargs oc delete virtualservices)
-	@echo $(shell oc get destinationrules | grep "^feed" | cut -f1 -d ' ' | xargs oc delete destinationrules)
+	oc delete -f 6-feed/1-drule.yaml
+	oc delete -f 6-feed/2-vs.yaml
 	oc create -f demos/2-demo-mirror-rule.yaml
-demo3-debug-clean:
+	oc create -f 0-init/12-tel.yaml
+
+demo2-mirror-clean:
 	oc delete -f demos/2-demo-debug.yaml
-	@echo $(shell oc get virtualservices | grep "^feed" | cut -f1 -d ' ' | xargs oc delete virtualservices)
-	@echo $(shell oc get destinationrules | grep "^feed" | cut -f1 -d ' ' | xargs oc delete destinationrules)
+	oc delete -f demos/2-demo-mirror-rule.yaml
+	oc delete -f 0-init/12-tel.yaml
 	oc create -f 6-feed/1-drule.yaml
 	oc create -f 6-feed/2-vs.yaml
+	
 

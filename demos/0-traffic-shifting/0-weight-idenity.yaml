@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-new-version
+  labels:
+    app: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: identity
+        version: v2
+    spec:
+      containers:
+      - name: identity
+        image: docker-registry.default.svc:5000/nemo/identity-new-version:0.1
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+        ports:
+        - containerPort: 8080
