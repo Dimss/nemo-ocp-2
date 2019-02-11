@@ -89,6 +89,25 @@ demo0-traffic-header-identity-step3-clean:
 	oc create -f 1-identity/2-drule.yaml
 	oc create -f 1-identity/3-vs.yaml
 
+demo0-traffic-header-ui-step4:
+	oc delete -f 0-ui/drule.yaml
+	oc delete -f 0-ui/vs.yaml
+	oc create -f demos/0-traffic-shifting/3-header-ui.yaml
+
+demo0-traffic-header-ui-step4-clean:
+	oc delete -f demos/0-traffic-shifting/3-header-ui.yaml
+	oc create -f 0-ui/drule.yaml
+	oc create -f 0-ui/vs.yaml
+
+demo0-traffic-weight-ui-step5:
+	oc delete -f 0-ui/drule.yaml
+	oc delete -f 0-ui/vs.yaml
+	oc create -f demos/0-traffic-shifting/4-weight-ui.yaml
+
+demo0-traffic-weight-ui-step5-clean:
+	oc delete -f demos/0-traffic-shifting/4-weight-ui.yaml
+	oc create -f 0-ui/drule.yaml
+	oc create -f 0-ui/vs.yaml
 
 demo0-delay:
 	@echo $(shell oc get virtualservices | grep "^likes" | cut -f1 -d ' ' | xargs oc delete virtualservices)

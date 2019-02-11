@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-new-version
+  labels:
+    app: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ui
+        version: v2
+    spec:
+      containers:
+      - name: ui
+        image: docker-registry.default.svc:5000/nemo/ui-new-version:0.1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: ui
+spec:
+  host: ui
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ui
+spec:
+  hosts:
+  - frontend.nemo
+  - ui
+  gateways:
+  - nemo-gateway
+  http:
+  - match:
+    - headers:
+        X-APP-TEST:
+          exact: test
+    route:
+    - destination:
+        host: ui
+        subset: v2
+  - route:
+    - destination:
+        host: ui
+        subset: v1
+      weight: 100
